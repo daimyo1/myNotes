@@ -1,2 +1,1 @@
-# myNotes
-A simple note app.
+# Note Taker Starter Code
