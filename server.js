@@ -40,25 +40,25 @@ app.post('/api/notes', (req, res) => {
 });     
 
 app.delete('/api/notes/:id', (req, res) => {
-    const noteId = req.params.id;
+    const noteId = parseInt(req.params.id, 10);  // Ensure noteId is an integer
     fs.readFile('./db/db.json', 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send('An error occurred while reading the file.');
+        return;
+      }
+      const notes = JSON.parse(data);
+      const newNotes = notes.filter(note => note.id !== noteId);
+      fs.writeFile('./db/db.json', JSON.stringify(newNotes), (err) => {
         if (err) {
-            console.error(err);
-            res.status(500).send('An error occurred while reading the file.');
-            return;
+          console.error(err);
+          res.status(500).send('An error occurred while writing the file.');
+          return;
         }
-        const notes = JSON.parse(data);
-        const newNotes = notes.filter(note => note.id !== noteId);
-        fs.writeFile('./db/db.json', JSON.stringify(newNotes), (err) => {
-            if (err) {
-                console.error(err);
-                res.status(500).send('An error occurred while writing the file.');
-                return;
-            }
-            res.send();
-        });
-    }); 
-});         
+        res.send();
+      });
+    });
+  });      
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, './public/index.html'));
